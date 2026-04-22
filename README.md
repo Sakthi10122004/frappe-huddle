@@ -4,7 +4,7 @@
 
 [![Frappe](https://img.shields.io/badge/Built%20on-Frappe%20v15-blue)](https://frappeframework.com)
 [![Jitsi](https://img.shields.io/badge/Powered%20by-Jitsi%20Meet-green)](https://jitsi.org)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/yourusername/frappe-huddle/pulls)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Sakthi10122004/frappe-huddle/pulls)
 
 ---
 
