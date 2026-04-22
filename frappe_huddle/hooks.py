@@ -148,23 +148,11 @@ app_license = "mit"
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"frappe_huddle.tasks.all"
-# 	],
-# 	"daily": [
-# 		"frappe_huddle.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"frappe_huddle.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"frappe_huddle.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"frappe_huddle.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+	"all": [
+		"frappe_huddle.frappe_huddle.doctype.huddle_meeting.huddle_meeting.sync_all_statuses"
+	]
+}
 
 # Testing
 # -------

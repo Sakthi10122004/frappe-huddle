@@ -1,0 +1,925 @@
+{% extends "templates/web.html" %}
+
+{% block header %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --primary: #6366f1;
+        --primary-hover: #4f46e5;
+        --primary-glow: rgba(99, 102, 241, 0.2);
+        --accent: #f43f5e;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --surface: #ffffff;
+        --surface-glass: rgba(255, 255, 255, 0.7);
+        --bg-main: #f8fafc;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
+        --border-main: #e2e8f0;
+        --radius-sm: 8px;
+        --radius-md: 12px;
+        --radius-lg: 20px;
+        --radius-xl: 32px;
+        --shadow-subtle: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+        --shadow-premium: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background: var(--bg-main);
+        color: var(--text-main);
+        overflow-x: hidden;
+    }
+
+    .navbar, .navbar-light, .footer { display: none !important; }
+
+    /* Layout */
+    .huddle-container {
+        display: flex;
+        min-height: 100vh;
+        gap: 0;
+    }
+
+    /* Sidebar */
+    .huddle-sidebar {
+        width: 280px;
+        background: var(--surface);
+        border-right: 1px solid var(--border-main);
+        display: flex;
+        flex-direction: column;
+        padding: 32px 20px;
+        position: fixed;
+        height: 100vh;
+        z-index: 100;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 48px;
+        padding: 0 8px;
+    }
+
+    .brand-logo {
+        width: 42px;
+        height: 42px;
+        background: linear-gradient(135deg, var(--primary), #818cf8);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 16px var(--primary-glow);
+    }
+
+    .brand-name {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        background: linear-gradient(to right, var(--text-main), var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .nav-list {
+        list-style: none;
+        flex: 1;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        margin-bottom: 8px;
+        border-radius: var(--radius-md);
+        color: var(--text-muted);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 15px;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        cursor: pointer;
+    }
+
+    .nav-item:hover {
+        color: var(--primary);
+        background: var(--bg-main);
+    }
+
+    .nav-item.active {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 10px 15px -3px var(--primary-glow);
+    }
+
+    .nav-item svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    .sidebar-footer {
+        margin-top: auto;
+        padding-top: 24px;
+        border-top: 1px solid var(--border-main);
+    }
+
+    .user-pill {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: var(--bg-main);
+        border-radius: var(--radius-md);
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid white;
+        box-shadow: var(--shadow-subtle);
+    }
+
+    /* Main Content */
+    .huddle-main {
+        flex: 1;
+        margin-left: 280px;
+        padding: 40px 60px;
+        transition: all 0.3s ease;
+    }
+
+    /* Header */
+    .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 48px;
+    }
+
+    .header-title h1 {
+        font-size: 32px;
+        font-weight: 800;
+        letter-spacing: -1px;
+    }
+
+    .header-title p {
+        color: var(--text-muted);
+        margin-top: 4px;
+        font-size: 15px;
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    /* Buttons */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        border-radius: var(--radius-md);
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        border: none;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 8px 20px var(--primary-glow);
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px var(--primary-glow);
+    }
+
+    .btn-secondary {
+        background: white;
+        color: var(--text-main);
+        border: 1px solid var(--border-main);
+    }
+
+    .btn-secondary:hover {
+        background: var(--bg-main);
+        border-color: var(--primary);
+    }
+
+    /* Dashboard Stats */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+        margin-bottom: 48px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 24px;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-main);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-premium);
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--text-main);
+    }
+
+    .stat-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    /* Grid Section */
+    .section-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .section-title h2 {
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .meetings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 24px;
+    }
+
+    .meeting-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-main);
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+    }
+
+    .meeting-card:hover {
+        border-color: var(--primary);
+        box-shadow: var(--shadow-premium);
+        transform: scale(1.02);
+    }
+
+    .meeting-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--primary);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .meeting-card:hover::before {
+        opacity: 1;
+    }
+
+    .meeting-status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 100px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+    }
+
+    .status-scheduled { background: #eff6ff; color: #3b82f6; }
+    .status-live { background: #ecfdf5; color: #10b981; }
+    .status-completed { background: #f1f5f9; color: #64748b; }
+
+    .live-dot {
+        width: 8px;
+        height: 8px;
+        background: currentColor;
+        border-radius: 50%;
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(0.95); opacity: 1; }
+        50% { transform: scale(1.2); opacity: 0.5; }
+        100% { transform: scale(0.95); opacity: 1; }
+    }
+
+    .meeting-time {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-muted);
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 12px;
+    }
+
+    .meeting-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 24px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .meeting-participants {
+        display: flex;
+        align-items: center;
+        gap: -8px;
+        margin-bottom: 24px;
+    }
+
+    .participant-stack {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+    }
+
+    .tiny-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 2px solid white;
+        background: #e2e8f0;
+        margin-left: -10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        color: white;
+    }
+
+    .bg-avatar-0 { background: #6366f1; }
+    .bg-avatar-1 { background: #f43f5e; }
+    .bg-avatar-2 { background: #10b981; }
+    .bg-avatar-3 { background: #f59e0b; }
+    .bg-avatar-4 { background: #8b5cf6; }
+
+    .meeting-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-main);
+    }
+
+    .host-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(8px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 24px;
+    }
+
+    .modal-overlay.active { display: flex; animation: fadeIn 0.2s ease; }
+
+    .modal-content {
+        background: white;
+        width: 100%;
+        max-width: 600px;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-premium);
+        overflow: hidden;
+        animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes scaleIn { from { transform: scale(0.9) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+
+    .modal-header {
+        padding: 32px;
+        background: var(--bg-main);
+        border-bottom: 1px solid var(--border-main);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-title { font-size: 24px; font-weight: 800; }
+
+    .modal-body { padding: 32px; }
+
+    .form-group { margin-bottom: 24px; }
+    .form-label { display: block; font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 10px; }
+    .form-input { 
+        width: 100%; 
+        padding: 14px 18px; 
+        border-radius: var(--radius-md); 
+        border: 2px solid var(--border-main);
+        font-family: inherit;
+        font-size: 15px;
+        transition: all 0.2s;
+    }
+    .form-input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px var(--primary-glow); }
+
+    .participant-selector {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        max-height: 200px;
+        overflow-y: auto;
+        padding: 8px;
+        border: 2px solid var(--border-main);
+        border-radius: var(--radius-md);
+    }
+
+    .selector-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+    }
+
+    .selector-item:hover { background: var(--bg-main); }
+    .selector-item.selected { background: var(--primary-glow); border-color: var(--primary); }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+        .stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+        .huddle-sidebar { width: 80px; padding: 24px 10px; }
+        .sidebar-brand span, .nav-item span, .user-info { display: none; }
+        .huddle-main { margin-left: 80px; padding: 24px; }
+        .content-header { flex-direction: column; align-items: flex-start; gap: 24px; }
+        .stats-row { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block page_content %}
+<div class="huddle-container">
+    <aside class="huddle-sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
+                    <path d="M15 10l5-5v14l-5-5"></path>
+                    <rect x="2" y="3" width="13" height="18" rx="3"></rect>
+                </svg>
+            </div>
+            <span class="brand-name">Huddle</span>
+        </div>
+
+        <nav class="nav-list">
+            <div class="nav-item active" data-view="meetings">
+                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2m0 14H5V8h14v10M7 10h2v2H7v-2m0 4h2v2H7v-2m4-4h2v2h-2v-2m0 4h2v2h-2v-2m4-4h2v2h-2v-2m0 4h2v2h-2v-2Z"/></svg>
+                <span>Dashboard</span>
+            </div>
+            {% if can_configure %}
+            <div class="nav-item" data-view="team">
+                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M16 13c-2.21 0-4 1.79-4 4 0 2.21 1.79 4 4 4s4-1.79 4-4c0-2.21-1.79-4-4-4m0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2m-6-1c0-1.1-.9-2-2-2s-2 .9-2 2 .9 2 2 2 2-.9 2-2m-2-6c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m2 8c0-2.21-1.79-4-4-4s-4 1.79-4 4c0 2.21 1.79 4 4 4s4-1.79 4-4m0-6V7c0-1.1-.9-2-2-2h-3V3H5v2H2c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2h3V9h2v2h2v2h2v1Z"/></svg>
+                <span>Team</span>
+            </div>
+            <div class="nav-item" data-view="settings">
+                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7 2h-1.63c-.15.58-.4 1.12-.73 1.63l.97.97a1 1 0 0 1 0 1.41l-1.42 1.42a1 1 0 0 1-1.41 0l-.97-.97c-.51.33-1.05.58-1.63.73V22a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1.63c-.58-.15-1.12-.4-1.63-.73l-.97.97a1 1 0 0 1-1.41 0l-1.42-1.42a1 1 0 0 1 0-1.41l.97-.97c-.33-.51-.58-1.05-.73-1.63H3a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1h1.63c.15-.58.4-1.12.73-1.63l-.97-.97a1 1 0 0 1 0-1.41l1.42-1.42a1 1 0 0 1 1.41 0l.97.97c.51-.33 1.05-.58 1.63-.73V2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1.63c.58.15 1.12.4 1.63.73l.97-.97a1 1 0 0 1 1.41 0l1.42 1.42a1 1 0 0 1 0 1.41l-.97.97c.33.51.58 1.05.73 1.63H21a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1Z"/></svg>
+                <span>Settings</span>
+            </div>
+            {% endif %}
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-pill">
+                <div class="tiny-avatar" style="background: var(--primary); width: 36px; height: 36px; margin: 0;">{{ frappe.session.user[0]|upper }}</div>
+                <div class="user-info">
+                    <div style="font-weight: 700; font-size: 13px;">{{ frappe.session.user.split('@')[0]|capitalize }}</div>
+                    <div style="font-size: 11px; color: var(--success); font-weight: 600;">Active Now</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="huddle-main">
+        <!-- Dashboard View -->
+        <div id="view-meetings" class="view-panel active">
+            <header class="content-header">
+                <div class="header-title">
+                    <h1>Your Meetings</h1>
+                    <p>Welcome back! You have {{ meetings|length }} meetings scheduled.</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="location.href='/app'">Go to Desk</button>
+                    <button class="btn btn-primary" onclick="openModal('create-meeting-modal')">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"></path></svg>
+                        New Meeting
+                    </button>
+                </div>
+            </header>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #eef2ff; color: #6366f1;">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <div class="stat-value">{{ meetings|length }}</div>
+                    <div class="stat-label">Total Meetings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #ecfdf5; color: #10b981;">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10l5-5v14l-5-5M4 19h10a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <div class="stat-value">{{ meetings|selectattr("status", "equalto", "In Progress")|list|length }}</div>
+                    <div class="stat-label">Live Currently</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #fffbeb; color: #f59e0b;">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+                    </div>
+                    <div class="stat-value">{% set next = meetings|selectattr("status", "equalto", "Scheduled")|list|sort(attribute="meeting_date")|first %}{{ next.duration if next else '0' }}</div>
+                    <div class="stat-label">Mins Next Huddle</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #fdf2f8; color: #db2777;">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    </div>
+                    <div class="stat-value">{{ team_members|length }}</div>
+                    <div class="stat-label">Team Size</div>
+                </div>
+            </div>
+
+            <div class="section-title">
+                <h2>Upcoming & Recent</h2>
+                <div class="header-actions">
+                    <div class="search-box" style="position:relative;">
+                        <input type="text" id="meeting-search" class="form-input" placeholder="Search meetings..." style="padding: 10px 16px; width: 240px; border-radius: 100px;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="meetings-grid" id="meetings-list">
+                {% for meeting in meetings %}
+                <div class="meeting-card" onclick="showMeetingDetails('{{ meeting.name }}')" data-title="{{ meeting.title|lower }}">
+                    <div class="meeting-status-pill status-{{ 'live' if meeting.status == 'In Progress' else meeting.status|lower }}">
+                        {% if meeting.status == 'In Progress' %}<span class="live-dot"></span>{% endif %}
+                        {{ meeting.status }}
+                    </div>
+                    
+                    <div class="meeting-time">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                        {{ frappe.utils.format_datetime(meeting.meeting_date, "medium") }}
+                    </div>
+                    
+                    <h3 class="meeting-title">{{ meeting.title }}</h3>
+                    
+                    <div class="meeting-participants">
+                        <div class="participant-stack">
+                            {% for p in meeting.participants[:5] %}
+                                <div class="tiny-avatar bg-avatar-{{ loop.index0 % 5 }}" title="{{ p.full_name }}">
+                                    {{ p.full_name[0]|upper }}
+                                </div>
+                            {% endfor %}
+                            {% if meeting.participants|length > 5 %}
+                                <div class="tiny-avatar" style="background: #94a3b8;">+{{ meeting.participants|length - 5 }}</div>
+                            {% endif %}
+                        </div>
+                        <span style="font-size: 12px; color: var(--text-muted); font-weight: 600; margin-left: 10px;">
+                            {{ meeting.participants|length }} participants
+                        </span>
+                    </div>
+
+                    <div class="meeting-card-footer">
+                        <div class="host-info">
+                            <div class="tiny-avatar" style="width: 24px; height: 24px; margin: 0; background: #64748b;">{{ meeting.user_fullname[0] }}</div>
+                            Hosted by {{ meeting.user_fullname.split(' ')[0] }}
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            {% if meeting.owner == frappe.session.user %}
+                            <button class="btn btn-secondary" style="padding: 6px 12px; border-radius: 100px; color: var(--accent); border-color: var(--accent);" onclick="event.stopPropagation(); cancelMeeting('{{ meeting.name }}')">Cancel</button>
+                            {% endif %}
+                            <a href="{{ meeting.jitsi_url }}" target="_blank" class="btn btn-primary" style="padding: 6px 16px; border-radius: 100px; box-shadow: none;" onclick="event.stopPropagation()">Join</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Team View -->
+        <div id="view-team" class="view-panel" style="display:none;">
+            <header class="content-header">
+                <div class="header-title">
+                    <h1>Team Members</h1>
+                    <p>Manage your collaboration network</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="openModal('invite-modal')">Invite Member</button>
+                </div>
+            </header>
+
+            <div class="meetings-grid">
+                {% for member in team_members %}
+                <div class="meeting-card" style="text-align:center; padding: 32px 24px;">
+                    <div class="stat-icon" style="width: 80px; height: 80px; font-size: 32px; margin: 0 auto 20px; background: linear-gradient(135deg, var(--primary), #818cf8); color: white; border-radius: 50%;">
+                        {{ member.full_name[0] }}
+                    </div>
+                    <div style="font-size: 18px; font-weight: 800; margin-bottom: 4px;">{{ member.full_name }}</div>
+                    <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">{{ member.email }}</div>
+                    <div class="meeting-status-pill status-live" style="margin-bottom: 0;">Active</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Settings View -->
+        <div id="view-settings" class="view-panel" style="display:none;">
+            <header class="content-header">
+                <div class="header-title">
+                    <h1>Settings</h1>
+                    <p>Configure your workspace workspace</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="saveHuddleSettings()">Save Changes</button>
+                </div>
+            </header>
+
+            <div class="modal-content" style="max-width: 800px; animation: none; box-shadow: var(--shadow-subtle);">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Jitsi Domain</label>
+                        <input type="text" id="jitsi_domain" class="form-input" value="{{ huddle_settings.jitsi_domain or '' }}" placeholder="meet.jit.si">
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">The domain of your Jitsi Meet server (default: meet.jit.si)</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Default Meeting Duration (min)</label>
+                        <input type="number" class="form-input" value="60">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Modals -->
+<div id="create-meeting-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">New Huddle</h2>
+            <button class="btn btn-secondary" style="padding: 8px;" onclick="closeModal('create-meeting-modal')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">Meeting Title</label>
+                <input type="text" id="new_meeting_title" class="form-input" placeholder="e.g. Weekly Sync, Design Review">
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label class="form-label">Date & Time</label>
+                    <input type="datetime-local" id="new_meeting_date" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Duration (min)</label>
+                    <input type="number" id="new_meeting_duration" value="30" class="form-input">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Add Participants</label>
+                <div class="participant-selector" id="member-selector">
+                    {% for member in team_members %}
+                    <div class="selector-item" data-email="{{ member.email }}" data-name="{{ member.full_name }}" onclick="toggleParticipant(this)">
+                        <div class="tiny-avatar" style="width: 28px; height: 28px; margin: 0;">{{ member.full_name[0] }}</div>
+                        <div style="font-size: 13px; font-weight: 600;">{{ member.full_name }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <button class="btn btn-primary" style="width: 100%; justify-content:center; padding: 16px;" onclick="submitCreateMeeting()">Create Meeting</button>
+        </div>
+    </div>
+</div>
+
+<div id="invite-modal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 450px;">
+        <div class="modal-header">
+            <h2 class="modal-title">Invite Member</h2>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" id="new_member_name" class="form-input" placeholder="John Doe">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" id="new_member_email" class="form-input" placeholder="john@company.com">
+            </div>
+            <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="submitInvite()">Send Invite</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const target = item.getAttribute('data-view');
+            
+            // UI Update
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            
+            document.querySelectorAll('.view-panel').forEach(p => p.style.display = 'none');
+            document.getElementById(`view-${target}`).style.display = 'block';
+        });
+    });
+
+    // Modal Control
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    // Participant Toggle
+    const selectedParticipants = new Set();
+    function toggleParticipant(el) {
+        const email = el.getAttribute('data-email');
+        const name = el.getAttribute('data-name');
+        
+        if (selectedParticipants.has(email)) {
+            selectedParticipants.delete(email);
+            el.classList.remove('selected');
+        } else {
+            selectedParticipants.add(email);
+            el.classList.add('selected');
+        }
+    }
+
+    // API: Create Meeting
+    async function submitCreateMeeting() {
+        const title = document.getElementById('new_meeting_title').value;
+        const date = document.getElementById('new_meeting_date').value;
+        const duration = document.getElementById('new_meeting_duration').value;
+        const participants = [];
+        
+        document.querySelectorAll('.selector-item.selected').forEach(item => {
+            participants.push({
+                email: item.getAttribute('data-email'),
+                full_name: item.getAttribute('data-name')
+            });
+        });
+
+        if (!title || !date) {
+            frappe.show_alert({message: 'Title and Date are required', indicator: 'red'});
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/method/frappe_huddle.www.huddle.create_meeting', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    title, 
+                    meeting_date: date, 
+                    duration,
+                    participants: JSON.stringify(participants)
+                })
+            });
+            const data = await res.json();
+            if (data.message?.status === 'ok') {
+                frappe.show_alert({message: 'Meeting created successfully!', indicator: 'green'});
+                location.reload();
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    // API: Invite Member
+    async function submitInvite() {
+        const full_name = document.getElementById('new_member_name').value;
+        const email = document.getElementById('new_member_email').value;
+        
+        if (!full_name || !email) return;
+
+        const res = await fetch('/api/method/frappe_huddle.www.huddle.add_team_member', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ full_name, email })
+        });
+        
+        const data = await res.json();
+        if (data.message?.status === 'ok') {
+            frappe.show_alert({message: 'Invitation sent!', indicator: 'green'});
+            location.reload();
+        }
+    }
+
+    // Meeting Search
+    document.getElementById('meeting-search').addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        document.querySelectorAll('.meeting-card').forEach(card => {
+            const title = card.getAttribute('data-title');
+            card.style.display = title.includes(query) ? 'block' : 'none';
+        });
+    });
+
+    async function cancelMeeting(name) {
+        if (!confirm('Are you sure you want to cancel this huddle?')) return;
+        
+        try {
+            const res = await fetch('/api/method/frappe_huddle.www.huddle.cancel_meeting', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ meeting_name: name })
+            });
+            const data = await res.json();
+            if (data.message?.status === 'ok') {
+                frappe.show_alert({message: 'Huddle cancelled', indicator: 'orange'});
+                location.reload();
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    function showMeetingDetails(name) {
+        // For now, let's just trigger the join or show a simple alert
+        // A full detail modal can be added if needed, but since cards are rich, 
+        // usually clicking them leads to JOIN or specific actions.
+        console.log("Show details for " + name);
+    }
+
+    // Handle outside clicks
+    window.onclick = (e) => {
+        if (e.target.classList.contains('modal-overlay')) {
+            e.target.classList.remove('active');
+        }
+    }
+
+    // Initial check for hash or view
+    window.onload = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('view')) {
+            const v = urlParams.get('view');
+            const item = document.querySelector(`[data-view="${v}"]`);
+            if (item) item.click();
+        }
+    }
+</script>
+{% endblock %}

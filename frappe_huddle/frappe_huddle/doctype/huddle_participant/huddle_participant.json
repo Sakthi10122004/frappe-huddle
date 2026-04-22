@@ -1,0 +1,87 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-04-18 11:22:37.690122",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "user",
+  "full_name",
+  "email",
+  "role",
+  "invite_status",
+  "joined",
+  "joined_at"
+ ],
+ "fields": [
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "User",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "user.full_name",
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Full Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "user.email",
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Email",
+   "options": "Email",
+   "read_only": 1
+  },
+  {
+   "default": "Participant",
+   "fieldname": "role",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Role",
+   "options": "Host\nParticipant"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "invite_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Invite Status",
+   "options": "Pending\nAccepted\nDeclined"
+  },
+  {
+   "default": "0",
+   "fieldname": "joined",
+   "fieldtype": "Check",
+   "label": "Joined"
+  },
+  {
+   "fieldname": "joined_at",
+   "fieldtype": "Datetime",
+   "label": "Joined At",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-04-18 11:27:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Huddle",
+ "name": "Huddle Participant",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -1,0 +1,147 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:HM-{####}",
+ "creation": "2026-04-18 11:22:36.222598",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "status",
+  "meeting_date",
+  "duration",
+  "agenda",
+  "jitsi_room_section",
+  "jitsi_room",
+  "jitsi_url",
+  "jitsi_embed",
+  "participants_section",
+  "participants",
+  "more_info_section",
+  "description",
+  "created_by_user"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "default": "Scheduled",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Scheduled\nIn Progress\nCompleted\nCancelled"
+  },
+  {
+   "fieldname": "meeting_date",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Meeting Date",
+   "reqd": 1
+  },
+  {
+   "default": "60",
+   "fieldname": "duration",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Duration (mins)"
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Datetime",
+   "label": "End Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "agenda",
+   "fieldtype": "Text Editor",
+   "label": "Agenda"
+  },
+  {
+   "fieldname": "jitsi_room_section",
+   "fieldtype": "Section Break",
+   "label": "Jitsi Room"
+  },
+  {
+   "fieldname": "jitsi_room",
+   "fieldtype": "Data",
+   "label": "Room Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "jitsi_url",
+   "fieldtype": "Data",
+   "label": "Meeting URL",
+   "read_only": 1
+  },
+  {
+   "fieldname": "jitsi_embed",
+   "fieldtype": "HTML",
+   "label": "Jitsi Embed"
+  },
+  {
+   "fieldname": "participants_section",
+   "fieldtype": "Section Break",
+   "label": "Participants"
+  },
+  {
+   "fieldname": "participants",
+   "fieldtype": "Table",
+   "label": "Participants",
+   "options": "Huddle Participant"
+  },
+  {
+   "fieldname": "more_info_section",
+   "fieldtype": "Section Break",
+   "label": "More Info"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Text Editor",
+   "label": "Description"
+  },
+  {
+   "fieldname": "created_by_user",
+   "fieldtype": "Link",
+   "label": "Created By",
+   "options": "User",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "has_calendar": 1,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-04-18 11:27:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Huddle",
+ "name": "Huddle Meeting",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "title"
+}

@@ -1,0 +1,116 @@
+{
+ "actions": [],
+ "creation": "2026-04-18 11:22:37.859968",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "jitsi_configuration_section",
+  "jitsi_domain",
+  "app_id",
+  "app_secret",
+  "default_settings_section",
+  "default_duration",
+  "enable_waiting_room",
+  "enable_recording",
+  "email_settings_section",
+  "send_email_invite",
+  "email_template"
+ ],
+ "fields": [
+  {
+   "fieldname": "jitsi_configuration_section",
+   "fieldtype": "Section Break",
+   "label": "Jitsi Configuration"
+  },
+  {
+   "description": "e.g. meet.jit.si or your self-hosted domain",
+   "fieldname": "jitsi_domain",
+   "fieldtype": "Data",
+   "label": "Jitsi Domain"
+  },
+  {
+   "description": "From your Jitsi server",
+   "fieldname": "app_id",
+   "fieldtype": "Data",
+   "label": "App ID"
+  },
+  {
+   "description": "JWT signing secret",
+   "fieldname": "app_secret",
+   "fieldtype": "Password",
+   "label": "App Secret"
+  },
+  {
+   "fieldname": "default_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Default Settings"
+  },
+  {
+   "default": "60",
+   "fieldname": "default_duration",
+   "fieldtype": "Int",
+   "label": "Default Duration"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_waiting_room",
+   "fieldtype": "Check",
+   "label": "Enable Waiting Room"
+  },
+  {
+   "default": "0",
+   "description": "Self-hosted only",
+   "fieldname": "enable_recording",
+   "fieldtype": "Check",
+   "label": "Enable Recording"
+  },
+  {
+   "fieldname": "email_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Email Settings"
+  },
+  {
+   "default": "0",
+   "description": "Auto-send on save",
+   "fieldname": "send_email_invite",
+   "fieldtype": "Check",
+   "label": "Send Email Invite"
+  },
+  {
+   "depends_on": "eval:doc.send_email_invite",
+   "fieldname": "email_template",
+   "fieldtype": "Link",
+   "label": "Email Template",
+   "options": "Email Template"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-04-18 11:27:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Huddle",
+ "name": "Huddle Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
