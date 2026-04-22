@@ -193,12 +193,6 @@ Open an issue at [github.com/yourusername/frappe-huddle/issues](https://github.c
 
 ---
 
-## 📄 License
-
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
-
----
-
 ## 🙏 Acknowledgements
 
 - [Frappe Framework](https://frappeframework.com) — the backbone of this app
