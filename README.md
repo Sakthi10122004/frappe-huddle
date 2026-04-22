@@ -31,12 +31,6 @@ Think of it as **Google Calendar + Google Meet**, but fully open source and embe
 
 ---
 
-## 📸 Screenshots
-
-> Coming soon
-
----
-
 ## 🏗️ Tech Stack
 
 | Layer | Technology |
