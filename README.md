@@ -189,7 +189,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a PR.
 ## 🐛 Reporting Issues
 
 Found a bug or have a feature request?
-Open an issue at [github.com/yourusername/frappe-huddle/issues](https://github.com/Sakthi10122004/frappe-huddle/issues)
+Open an issue at [issues](https://github.com/Sakthi10122004/frappe-huddle/issues)
 
 ---
 
