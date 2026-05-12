@@ -1,116 +1,220 @@
 {
- "actions": [],
- "creation": "2026-04-18 11:22:37.859968",
- "doctype": "DocType",
- "editable_grid": 1,
- "engine": "InnoDB",
- "field_order": [
-  "jitsi_configuration_section",
-  "jitsi_domain",
-  "app_id",
-  "app_secret",
-  "default_settings_section",
-  "default_duration",
-  "enable_waiting_room",
-  "enable_recording",
-  "email_settings_section",
-  "send_email_invite",
-  "email_template"
- ],
- "fields": [
-  {
-   "fieldname": "jitsi_configuration_section",
-   "fieldtype": "Section Break",
-   "label": "Jitsi Configuration"
-  },
-  {
-   "description": "e.g. meet.jit.si or your self-hosted domain",
-   "fieldname": "jitsi_domain",
-   "fieldtype": "Data",
-   "label": "Jitsi Domain"
-  },
-  {
-   "description": "From your Jitsi server",
-   "fieldname": "app_id",
-   "fieldtype": "Data",
-   "label": "App ID"
-  },
-  {
-   "description": "JWT signing secret",
-   "fieldname": "app_secret",
-   "fieldtype": "Password",
-   "label": "App Secret"
-  },
-  {
-   "fieldname": "default_settings_section",
-   "fieldtype": "Section Break",
-   "label": "Default Settings"
-  },
-  {
-   "default": "60",
-   "fieldname": "default_duration",
-   "fieldtype": "Int",
-   "label": "Default Duration"
-  },
-  {
-   "default": "0",
-   "fieldname": "enable_waiting_room",
-   "fieldtype": "Check",
-   "label": "Enable Waiting Room"
-  },
-  {
-   "default": "0",
-   "description": "Self-hosted only",
-   "fieldname": "enable_recording",
-   "fieldtype": "Check",
-   "label": "Enable Recording"
-  },
-  {
-   "fieldname": "email_settings_section",
-   "fieldtype": "Section Break",
-   "label": "Email Settings"
-  },
-  {
-   "default": "0",
-   "description": "Auto-send on save",
-   "fieldname": "send_email_invite",
-   "fieldtype": "Check",
-   "label": "Send Email Invite"
-  },
-  {
-   "depends_on": "eval:doc.send_email_invite",
-   "fieldname": "email_template",
-   "fieldtype": "Link",
-   "label": "Email Template",
-   "options": "Email Template"
-  }
- ],
- "grid_page_length": 50,
- "index_web_pages_for_search": 1,
- "issingle": 1,
- "links": [],
- "modified": "2026-04-18 11:27:00.000000",
- "modified_by": "Administrator",
- "module": "Frappe Huddle",
- "name": "Huddle Settings",
- "owner": "Administrator",
- "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
-  }
- ],
- "row_format": "Dynamic",
- "rows_threshold_for_grid_search": 20,
- "sort_field": "modified",
- "sort_order": "DESC",
- "states": []
+    "actions": [],
+    "creation": "2026-04-18 11:22:37.859968",
+    "doctype": "DocType",
+    "editable_grid": 1,
+    "engine": "InnoDB",
+    "field_order": [
+        "jitsi_configuration_section",
+        "jitsi_domain",
+        "app_id",
+        "app_secret",
+        "default_settings_section",
+        "default_duration",
+        "enable_waiting_room",
+        "enable_recording",
+        "column_break_duration",
+        "enforce_duration_limit",
+        "max_duration_minutes",
+        "duration_enforcement_mode",
+        "reminder_settings_section",
+        "enable_reminders",
+        "reminder_minutes",
+        "column_break_reminder",
+        "send_reminder_email",
+        "reminder_email_template",
+        "email_settings_section",
+        "send_email_invite",
+        "email_template",
+        "column_break_email",
+        "reschedule_email_template",
+        "cancellation_email_template",
+        "webhook_secret"
+    ],
+    "fields": [
+        {
+            "fieldname": "jitsi_configuration_section",
+            "fieldtype": "Section Break",
+            "label": "Jitsi Configuration"
+        },
+        {
+            "description": "e.g. meet.jit.si or your self-hosted domain",
+            "fieldname": "jitsi_domain",
+            "fieldtype": "Data",
+            "label": "Jitsi Domain"
+        },
+        {
+            "description": "From your Jitsi server",
+            "fieldname": "app_id",
+            "fieldtype": "Data",
+            "label": "App ID"
+        },
+        {
+            "description": "JWT signing secret",
+            "fieldname": "app_secret",
+            "fieldtype": "Password",
+            "label": "App Secret"
+        },
+        {
+            "fieldname": "default_settings_section",
+            "fieldtype": "Section Break",
+            "label": "Default Settings"
+        },
+        {
+            "default": "60",
+            "fieldname": "default_duration",
+            "fieldtype": "Int",
+            "label": "Default Duration (mins)"
+        },
+        {
+            "default": "0",
+            "fieldname": "enable_waiting_room",
+            "fieldtype": "Check",
+            "label": "Enable Waiting Room / Lobby"
+        },
+        {
+            "default": "0",
+            "description": "Self-hosted only",
+            "fieldname": "enable_recording",
+            "fieldtype": "Check",
+            "label": "Enable Recording"
+        },
+        {
+            "fieldname": "column_break_duration",
+            "fieldtype": "Column Break"
+        },
+        {
+            "default": "0",
+            "description": "Restrict meetings from exceeding the max duration",
+            "fieldname": "enforce_duration_limit",
+            "fieldtype": "Check",
+            "label": "Enforce Duration Limit"
+        },
+        {
+            "default": "120",
+            "depends_on": "eval:doc.enforce_duration_limit",
+            "description": "Maximum allowed meeting duration in minutes",
+            "fieldname": "max_duration_minutes",
+            "fieldtype": "Int",
+            "label": "Max Duration (mins)"
+        },
+        {
+            "default": "Warn",
+            "depends_on": "eval:doc.enforce_duration_limit",
+            "description": "Warn = show alert but allow; Hard = block save",
+            "fieldname": "duration_enforcement_mode",
+            "fieldtype": "Select",
+            "label": "Enforcement Mode",
+            "options": "Warn\nHard"
+        },
+        {
+            "fieldname": "reminder_settings_section",
+            "fieldtype": "Section Break",
+            "label": "Reminder Settings"
+        },
+        {
+            "default": "1",
+            "description": "Send popup and/or email reminders before meetings",
+            "fieldname": "enable_reminders",
+            "fieldtype": "Check",
+            "label": "Enable Reminders"
+        },
+        {
+            "default": "10",
+            "depends_on": "eval:doc.enable_reminders",
+            "description": "Minutes before meeting to send reminder",
+            "fieldname": "reminder_minutes",
+            "fieldtype": "Int",
+            "label": "Reminder Before (mins)"
+        },
+        {
+            "fieldname": "column_break_reminder",
+            "fieldtype": "Column Break"
+        },
+        {
+            "default": "1",
+            "depends_on": "eval:doc.enable_reminders",
+            "description": "Also send an email reminder",
+            "fieldname": "send_reminder_email",
+            "fieldtype": "Check",
+            "label": "Send Email Reminder"
+        },
+        {
+            "depends_on": "eval:doc.enable_reminders && doc.send_reminder_email",
+            "fieldname": "reminder_email_template",
+            "fieldtype": "Link",
+            "label": "Reminder Email Template",
+            "options": "Email Template"
+        },
+        {
+            "fieldname": "email_settings_section",
+            "fieldtype": "Section Break",
+            "label": "Email Settings"
+        },
+        {
+            "default": "0",
+            "description": "Auto-send on save",
+            "fieldname": "send_email_invite",
+            "fieldtype": "Check",
+            "label": "Send Email Invite"
+        },
+        {
+            "depends_on": "eval:doc.send_email_invite",
+            "fieldname": "email_template",
+            "fieldtype": "Link",
+            "label": "Email Template",
+            "options": "Email Template"
+        },
+        {
+            "fieldname": "column_break_email",
+            "fieldtype": "Column Break"
+        },
+        {
+            "depends_on": "eval:doc.send_email_invite",
+            "description": "Template for reschedule notifications",
+            "fieldname": "reschedule_email_template",
+            "fieldtype": "Link",
+            "label": "Reschedule Email Template",
+            "options": "Email Template"
+        },
+        {
+            "depends_on": "eval:doc.send_email_invite",
+            "description": "Template for cancellation notifications",
+            "fieldname": "cancellation_email_template",
+            "fieldtype": "Link",
+            "label": "Cancellation Email Template",
+            "options": "Email Template"
+        },
+        {
+            "fieldname": "webhook_secret",
+            "fieldtype": "Data",
+            "label": "Webhook Secret"
+        }
+    ],
+    "grid_page_length": 50,
+    "index_web_pages_for_search": 1,
+    "issingle": 1,
+    "links": [],
+    "modified": "2026-04-28 11:05:00.000000",
+    "modified_by": "Administrator",
+    "module": "Frappe Huddle",
+    "name": "Huddle Settings",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "print": 1,
+            "read": 1,
+            "role": "System Manager",
+            "share": 1,
+            "write": 1
+        }
+    ],
+    "row_format": "Dynamic",
+    "rows_threshold_for_grid_search": 20,
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": []
 }

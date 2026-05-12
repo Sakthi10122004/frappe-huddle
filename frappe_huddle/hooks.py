@@ -137,21 +137,22 @@ app_license = "mit"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+	"Event": {
+		"on_update": "frappe_huddle.frappe_huddle.doctype.huddle_meeting.huddle_meeting.sync_to_huddle_meeting"
+	}
+}
 
 # Scheduled Tasks
 # ---------------
 
 scheduler_events = {
-	"all": [
-		"frappe_huddle.frappe_huddle.doctype.huddle_meeting.huddle_meeting.sync_all_statuses"
-	]
+	"cron": {
+		"* * * * *": [
+			"frappe_huddle.frappe_huddle.doctype.huddle_meeting.huddle_meeting.sync_all_statuses",
+			"frappe_huddle.frappe_huddle.doctype.huddle_meeting.huddle_meeting.send_meeting_reminders"
+		]
+	}
 }
 
 # Testing

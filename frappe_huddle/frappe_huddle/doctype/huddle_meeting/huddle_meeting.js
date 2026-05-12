@@ -15,69 +15,89 @@ frappe.ui.form.on("Huddle Meeting", {
 
 		if (!frm.is_new() && frm.doc.jitsi_url && !is_completed && !is_cancelled && !is_past) {
 			frm.add_custom_button(
-			__("Join Huddle"),
-			function () {
+				__("Join Huddle"),
+				function () {
 
-				console.log("Joining:", frm.doc.name);
+					console.log("Joining:", frm.doc.name);
 
-				frappe.call({
-					method: "frappe_huddle.frappe_huddle.doctype.huddle_meeting.huddle_meeting.join_meeting",
-					args: { meeting_name: frm.doc.name },
-					freeze: true,
-					callback: function (r) {
-						if (r && r.message && r.message.join_url) {
+					frappe.call({
+						method: "frappe_huddle.frappe_huddle.doctype.huddle_meeting.huddle_meeting.join_meeting",
+						args: { meeting_name: frm.doc.name },
+						freeze: true,
+						callback: function (r) {
+							if (r && r.message && r.message.join_url) {
 
-							let jd = new frappe.ui.Dialog({
-								title: frm.doc.title,
-								size: "extra-large",
-								fields: [
-									{
-										fieldname: "jitsi_iframe",
-										fieldtype: "HTML",
-										options: `
-											<iframe src="${r.message.join_url}"
-												style="border:0; width:100%; height:calc(94vh - 80px); border-radius: 12px; background: #000;"
-												allow="camera;microphone;fullscreen;display-capture;autoplay;clipboard-write"
-												allowfullscreen>
-											</iframe>
-										`
+								let sid_val = frappe.utils.get_random(20);
+								let heartbeat_interval;
+
+								let jd = new frappe.ui.Dialog({
+									title: frm.doc.title,
+									size: "extra-large",
+									fields: [
+										{
+											fieldname: "jitsi_iframe",
+											fieldtype: "HTML",
+											options: `
+												<iframe src="${r.message.join_url}" id="jitsi_iframe"
+													style="border:0; width:100%; height:calc(94vh - 80px); border-radius: 12px; background: #000; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"
+													allow="camera;microphone;fullscreen;display-capture;autoplay;clipboard-write"
+													allowfullscreen>
+												</iframe>
+											`
+										}
+									],
+									on_page_show: () => {
+										// Start heartbeat for attendance tracking (DO NOT REMOVE)
+										heartbeat_interval = setInterval(() => {
+											frappe.call({
+												method: "frappe_huddle.frappe_huddle.doctype.huddle_meeting.huddle_meeting.update_presence",
+												args: { meeting_name: frm.doc.name, session_id: sid_val }
+											});
+										}, 20000);
+										// Initial heartbeat ping
+										frappe.call({
+											method: "frappe_huddle.frappe_huddle.doctype.huddle_meeting.huddle_meeting.update_presence",
+											args: { meeting_name: frm.doc.name, session_id: sid_val }
+										});
+									},
+									onhide: () => {
+										if (heartbeat_interval) clearInterval(heartbeat_interval);
 									}
-								]
-							});
+								});
 
-							jd.$wrapper.find(".modal-dialog").css({
-								"max-width": "96%",
-								"margin": "10px auto"
-							});
+								jd.$wrapper.find(".modal-dialog").css({
+									"max-width": "98%",
+									"margin": "10px auto"
+								});
 
-							jd.$wrapper.find(".modal-content").css("height", "94vh");
+								jd.$wrapper.find(".modal-content").css("height", "96vh");
 
-							jd.show();
-							
-							// Wait slightly then reload doc behind the dialog
-							setTimeout(() => {
-								if (frm.doc.status === "Scheduled") {
-									frm.reload_doc();
-								}
-							}, 500);
+								jd.show();
 
-						} else {
-							frappe.msgprint(__("Join URL not returned from server."));
+								setTimeout(() => {
+									if (frm.doc.status === "Scheduled") {
+										frm.reload_doc();
+									}
+								}, 800);
+
+							} else {
+								frappe.msgprint(__("Join URL not returned from server."));
+							}
+						},
+						error: function (err) {
+							console.error("API failed:", err);
+							frappe.msgprint(__("Server error while joining meeting."));
 						}
-					},
-					error: function (err) {
-						console.error("API failed:", err);
-						frappe.msgprint(__("Server error while joining meeting."));
-					}
-				});
-			},
-			null,
-			"primary"
-		);
+					});
+				},
+				null,
+				"primary"
+			);
 
-			// Add "Copy Link" button
+			// Add "Copy Link" button — Issue #6: Copy Frappe join URL, not raw Jitsi link
 			frm.add_custom_button(__("Copy Meeting Link"), function () {
-				frappe.utils.copy_to_clipboard(frm.doc.jitsi_url);
+				let frappe_join_url = window.location.origin + "/huddle/join?meeting=" + frm.doc.name;
+				frappe.utils.copy_to_clipboard(frappe_join_url);
 			});
 
 			// Add "Resend Invites" button
@@ -122,43 +142,62 @@ frappe.ui.form.on("Huddle Meeting", {
 		}
 	},
 
+	// ──── Issue #5: Client-side duration warning ────
+	duration(frm) {
+		if (!frm.doc.duration) return;
+
+		frappe.call({
+			method: "frappe.client.get_value",
+			args: {
+				doctype: "Huddle Settings",
+				fieldname: ["enforce_duration_limit", "max_duration_minutes", "duration_enforcement_mode"]
+			},
+			async: false,
+			callback: function (r) {
+				if (!r || !r.message) return;
+				let settings = r.message;
+
+				if (!settings.enforce_duration_limit) return;
+
+				let max_dur = settings.max_duration_minutes || 120;
+				if (frm.doc.duration > max_dur) {
+					let msg = `Duration (${frm.doc.duration} mins) exceeds the maximum of ${max_dur} mins.`;
+					if (settings.duration_enforcement_mode === "Hard") {
+						frappe.msgprint({
+							title: __("Duration Limit Exceeded"),
+							message: __(msg + " Please reduce the duration before saving."),
+							indicator: "red"
+						});
+						frm.set_value("duration", max_dur);
+					} else {
+						frappe.show_alert({
+							message: __(msg + " Consider shortening the meeting."),
+							indicator: "orange"
+						}, 7);
+					}
+				}
+			}
+		});
+	},
+
 	status(frm) {
 		// If user manually selects "Cancelled", prompt for Reschedule vs Cancel
 		if (frm.doc.status === "Cancelled" && !frm.__is_cancelling) {
 			// Revert temporarily to prevent accidental save without decision
 			const prev_status = frm.doc.__original_status || "Scheduled";
-			
-			frappe.warn(
-				__("Cancel Huddle?"),
-				__("Would you like to <b>Reschedule</b> this huddle for a later time or <b>Cancel</b> it entirely?"),
-				() => {
-					// Main Action: Reschedule
-					frm.set_value("status", "Scheduled");
-					frappe.msgprint(__("Please select a new <b>Meeting Date</b> and <b>Save</b> to reschedule."));
-					// Focus on date field
-					frm.scroll_to_field("meeting_date");
-				},
-				__("Reschedule"),
-				true // secondary action will be "Cancel"
-			);
-			
-			// Override the secondary action (Cancel) to actually set status to Cancelled
-			// Frappe's frappe.warn doesn't easily allow 3 buttons, so we use it for Reschedule vs Cancel
-			// If they click the Close (X) or "Cancel" (default secondary), we assume they want to Cancel
-			// Let's use a custom Dialog for better control
-			
+
 			let d = new frappe.ui.Dialog({
 				title: __("Cancel or Reschedule?"),
 				fields: [
 					{
 						fieldtype: "HTML",
 						options: `
-							<p>${__("You are about to cancel this huddle. Do you want to reschedule it for another time instead?")}</p>
-							<div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
-								<button class="btn btn-default btn-cancel-huddle" style="color: var(--red-600);">${__("Cancel Entirely")}</button>
-								<button class="btn btn-primary btn-reschedule-huddle">${__("Reschedule")}</button>
-							</div>
-						`
+											<p>${__("You are about to cancel this huddle. Do you want to reschedule it for another time instead?")}</p>
+											<div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+												<button class="btn btn-default btn-cancel-huddle" style="color: var(--red-600);">${__("Cancel Entirely")}</button>
+												<button class="btn btn-primary btn-reschedule-huddle">${__("Reschedule")}</button>
+											</div>
+									`
 					}
 				],
 			});
