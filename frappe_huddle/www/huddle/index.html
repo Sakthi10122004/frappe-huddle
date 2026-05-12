@@ -1623,7 +1623,8 @@
                     <div class="form-group">
                         <label class="form-label">App Secret</label>
                         <input type="password" id="app_secret" class="form-input"
-                            value="{{ huddle_settings.app_secret or '' }}" placeholder="JWT signing secret">
+                            value="" placeholder="Leave blank to keep existing secret">
+                        <p class="form-hint">Only fill this in to change the secret. Leave blank to keep the current value.</p>
                     </div>
                 </div>
 
@@ -1908,7 +1909,12 @@
     async function apiCall(method, body) {
         try {
             const res = await fetch(`/api/method/${method}`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // FIX: include CSRF token on every request
+                    'X-Frappe-CSRF-Token': frappe.csrf_token
+                },
                 body: JSON.stringify(body)
             });
             const data = await res.json();
@@ -2034,18 +2040,29 @@
 
     // ─── Save Settings ───
     async function saveHuddleSettings() {
+        const secretInput = document.getElementById('app_secret').value.trim();
+
         const settings = {
             jitsi_domain: document.getElementById('jitsi_domain').value,
             app_id: document.getElementById('app_id').value,
-            app_secret: document.getElementById('app_secret').value,
             default_duration: document.getElementById('default_duration').value,
             enable_waiting_room: document.getElementById('enable_waiting_room').checked ? 1 : 0,
             enable_recording: document.getElementById('enable_recording').checked ? 1 : 0,
             send_email_invite: document.getElementById('send_email_invite').checked ? 1 : 0,
             email_template: document.getElementById('email_template').value
         };
+
+        // FIX: only include app_secret if the user actually typed a new value
+        if (secretInput && secretInput !== '••••••••') {
+            settings.app_secret = secretInput;
+        }
+
         const data = await apiCall('frappe_huddle.www.huddle.save_settings', { settings: JSON.stringify(settings) });
-        if (data?.status === 'ok') frappe.show_alert({ message: 'Settings saved!', indicator: 'green' });
+        if (data?.status === 'ok') {
+            frappe.show_alert({ message: 'Settings saved!', indicator: 'green' });
+            // Clear the field after save so it doesn't show a stale value
+            document.getElementById('app_secret').value = '';
+        }
     }
 
     function showMeetingDetails(name) {
