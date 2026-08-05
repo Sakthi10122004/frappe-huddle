@@ -1,0 +1,44 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:HCM-{####}",
+ "creation": "2026-05-14 15:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "meeting",
+  "sender",
+  "message_type",
+  "message",
+  "sent_at",
+  "is_deleted",
+  "deleted_by"
+ ],
+ "fields": [
+  {"fieldname": "meeting", "fieldtype": "Link", "label": "Meeting", "options": "Huddle Meeting", "reqd": 1, "in_list_view": 1, "search_index": 1},
+  {"fieldname": "sender", "fieldtype": "Link", "label": "Sender", "options": "User", "reqd": 1, "in_list_view": 1},
+  {"fieldname": "message_type", "fieldtype": "Select", "label": "Message Type", "options": "Text\nSystem\nReaction", "default": "Text", "in_list_view": 1},
+  {"fieldname": "message", "fieldtype": "Long Text", "label": "Message", "reqd": 1, "in_list_view": 1},
+  {"fieldname": "sent_at", "fieldtype": "Datetime", "label": "Sent At", "in_list_view": 1, "read_only": 1},
+  {"fieldname": "is_deleted", "fieldtype": "Check", "label": "Is Deleted", "default": "0"},
+  {"fieldname": "deleted_by", "fieldtype": "Link", "label": "Deleted By", "options": "User", "read_only": 1}
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-05-18 15:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Huddle",
+ "name": "Huddle Chat Message",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {"create": 1, "delete": 1, "read": 1, "report": 1, "role": "System Manager", "write": 1},
+  {"create": 1, "read": 1, "role": "Huddle Admin", "write": 1},
+  {"create": 1, "read": 1, "role": "Huddle User"}
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

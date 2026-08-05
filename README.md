@@ -1,205 +1,74 @@
-# 🤝 Frappe Huddle
+# 📞 Frappe Huddle
 
-> Open source video meetings inside Frappe — powered by Jitsi Meet
+> Open source meeting tracking system inside Frappe
 
-[![Frappe](https://img.shields.io/badge/Built%20on-Frappe%20v15-blue)](https://frappeframework.com)
-[![Jitsi](https://img.shields.io/badge/Powered%20by-Jitsi%20Meet-green)](https://jitsi.org)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Sakthi10122004/frappe-huddle/pulls)
-
----
-
-## 🎯 What is Frappe Huddle?
-
-**Frappe Huddle** is a free and open source video meeting app built on the [Frappe Framework](https://frappeframework.com). It brings the power of [Jitsi Meet](https://jitsi.org) directly inside your Frappe or ERPNext workspace — schedule meetings, invite participants, and join video calls without ever leaving your Frappe desk.
-
-Think of it as **Google Calendar + Google Meet**, but fully open source and embedded inside Frappe.
+[![Frappe](https://img.shields.io/badge/Built%20on-Frappe-blue)](https://frappeframework.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
+
+## 🎯 What Is Frappe Huddle?
+
+**Frappe Huddle** is a meeting management and participant tracking system built on the [Frappe Framework](https://frappeframework.com). It provides a clean, structured way to schedule meetings, track who joined, who left, and whether meetings are active — all from within your Frappe workspace.
 
 ## ✨ Features
 
-- 📅 **Schedule meetings** — create meetings with title, date, duration and agenda
-- 🎥 **Jitsi embedded** — video room opens inside Frappe, no new tab or app needed
-- 🔐 **JWT authentication** — secure rooms, only invited users can join
-- 📧 **Email invites** — beautiful HTML invite emails sent automatically to participants
-- 👥 **Participant management** — track who is invited, accepted, declined and joined
-- 📆 **Calendar view** — see all meetings in Frappe's built-in calendar
-- ⚙️ **Huddle Settings** — configure your Jitsi domain, App ID, JWT secret from one place
-- 🏢 **Self-hosted or JaaS** — works with `meet.jit.si`, JaaS (8x8) or your own Jitsi server
-- 🔔 **Frappe notifications** — in-app alerts before meetings start
-- 📱 **Mobile friendly** — works on Frappe mobile interface
+- 📅 **Meeting scheduling** — create and schedule meetings with a title, host, and date
+- 👥 **Participant tracking** — track who joined, who left, and who disconnected
+- 🔄 **Status lifecycle** — meetings flow through `Scheduled → Live → Ended` or `Cancelled`
+- 🔒 **Unique room IDs** — every meeting gets a unique auto-generated room identifier
+- ⚙️ **Huddle Settings** — configure default duration, reminders, and email notifications
+- 👤 **Role-based access** — Huddle Admin, Huddle User, and Huddle Guest roles
 
----
-
-## 🏗️ Tech Stack
+## 📦 Tech Stack
 
 | Layer | Technology |
-|---|---|
-| Framework | Frappe v15 |
-| Video | Jitsi Meet (self-hosted or JaaS) |
-| Auth | JWT (JSON Web Tokens) |
-| Frontend | Frappe UI + FullCalendar.js |
-| Email | Frappe Email + Jinja templates |
-| Language | Python 3 + JavaScript |
-
----
+|-------|-----------|
+| Backend | Frappe Framework (Python) |
+| Frontend | Frappe Desk + Custom Portal |
+| Database | MariaDB |
 
 ## 🚀 Installation
 
-**Requirements**
-- Frappe Bench v15+
-- Python 3.10+
-- Node.js 18+
-
-**Steps**
-
 ```bash
-# Go to your bench directory
-cd /home/frappe/frappe-bench
-
-# Get the app
-bench get-app https://github.com/yourusername/frappe-huddle
-
-# Install on your site
-bench --site yoursite.local install-app frappe_huddle
-
-# Run migrations
-bench --site yoursite.local migrate
-
-# Restart bench
-bench restart
+bench get-app https://github.com/Sakthi10122004/frappe-huddle.git
+bench --site your-site install-app frappe_huddle
 ```
 
----
-
-## ⚙️ Configuration
-
-After installation go to:
-
-```
-yoursite.local/app/huddle-settings
-```
-
-Fill in the following:
-
-| Setting | Description |
-|---|---|
-| Jitsi Domain | `meet.jit.si` or your self-hosted domain |
-| App ID | From JaaS dashboard or your Jitsi server config |
-| App Secret | JWT signing secret |
-| Default Duration | Default meeting length in minutes |
-| Enable Waiting Room | Approve participants before they join |
-| Enable Recording | Available on self-hosted Jitsi with Jibri |
-| Send Email Invite | Auto-send invite emails on meeting save |
-
----
-
-## 🧩 DocTypes
+## 📋 DocTypes
 
 ### Huddle Meeting
-The main document for scheduling and managing meetings.
+
+The core meeting record.
 
 | Field | Type | Description |
-|---|---|---|
-| Title | Data | Meeting title |
-| Meeting Date | Datetime | Scheduled date and time |
-| Duration | Int | Duration in minutes |
-| Agenda | Text Editor | Meeting agenda |
-| Jitsi Room | Data | Auto-generated room name |
-| Jitsi URL | Data | Full meeting URL |
-| Status | Select | Scheduled / In Progress / Completed |
-| Participants | Table | Linked to Huddle Participant |
+|-------|------|-------------|
+| Title | Data | Meeting name |
+| Room ID | Data | Auto-generated unique identifier |
+| Host | Link → User | Meeting creator |
+| Status | Select | Scheduled / Live / Ended / Cancelled |
+| Scheduled At | Datetime | When the meeting is planned |
+| Started At | Datetime | When the meeting actually started |
+| Ended At | Datetime | When the meeting ended |
+| Is Active | Check | Whether the meeting is currently active |
 
-### Huddle Participant (Child Table)
-Tracks all invitees for a meeting.
+### Huddle Participant
+
+Tracks individual participation in meetings.
 
 | Field | Type | Description |
-|---|---|---|
-| User | Link | Frappe User |
-| Full Name | Data | Auto-fetched |
-| Email | Data | Auto-fetched |
-| Role | Select | Host / Participant |
-| Invite Status | Select | Pending / Accepted / Declined |
-| Joined | Check | Set when user joins |
+|-------|------|-------------|
+| Meeting | Link → Huddle Meeting | Which meeting |
+| User | Link → User | Which user |
+| State | Select | Joined / Left / Disconnected |
+| Joined At | Datetime | When the user joined |
+| Left At | Datetime | When the user left |
+| Is Active | Check | Whether the user is currently in the meeting |
 
-### Huddle Settings (Single)
-Global configuration for the app.
+## 📄 License
 
----
-
-## 🔄 How it works
-
-```
-User schedules meeting
-        ↓
-Jitsi room name auto-generated
-        ↓
-JWT token signed with App Secret
-        ↓
-Email invites sent to participants
-        ↓
-Meeting appears on Frappe calendar
-        ↓
-User clicks "Join Meeting" on the form
-        ↓
-Jitsi room opens inside Frappe Desk (iframe)
-        ↓
-Meeting status updates to "In Progress"
-```
+MIT
 
 ---
 
-## 🗺️ Roadmap
-
-- [ ] Google Calendar sync
-- [ ] Outlook Calendar sync
-- [ ] WhatsApp invite notifications
-- [ ] Meeting recordings saved to Frappe Files
-- [ ] AI meeting summary (post-call notes)
-- [ ] ERPNext CRM integration (link meetings to leads/customers)
-- [ ] Guest join link (no Frappe account required)
-- [ ] Recurring meetings
-- [ ] Meeting analytics dashboard
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Here's how to get started:
-
-```bash
-# Fork the repo and clone
-git clone https://github.com/yourusername/frappe-huddle
-cd frappe-huddle
-
-# Create a feature branch
-git checkout -b feature/your-feature-name
-
-# Make your changes and commit
-git commit -m "feat: add your feature"
-
-# Push and open a Pull Request
-git push origin feature/your-feature-name
-```
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a PR.
-
----
-
-## 🐛 Reporting Issues
-
-Found a bug or have a feature request?
-Open an issue at [issues](https://github.com/Sakthi10122004/frappe-huddle/issues)
-
----
-
-## 🙏 Acknowledgements
-
-- [Frappe Framework](https://frappeframework.com) — the backbone of this app
-- [Jitsi Meet](https://jitsi.org) — the open source video engine
-- [8x8 JaaS](https://jaas.8x8.vc) — Jitsi as a Service platform
-- [ERPNext](https://erpnext.com) — inspiration for open source enterprise tools
-
----
-
-<p align="center">Built with ❤️ on Frappe · Powered by Jitsi</p>
+<p align="center">Built with ❤️ on Frappe</p>

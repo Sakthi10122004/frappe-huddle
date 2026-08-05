@@ -1,220 +1,84 @@
 {
-    "actions": [],
-    "creation": "2026-04-18 11:22:37.859968",
-    "doctype": "DocType",
-    "editable_grid": 1,
-    "engine": "InnoDB",
-    "field_order": [
-        "jitsi_configuration_section",
-        "jitsi_domain",
-        "app_id",
-        "app_secret",
-        "default_settings_section",
-        "default_duration",
-        "enable_waiting_room",
-        "enable_recording",
-        "column_break_duration",
-        "enforce_duration_limit",
-        "max_duration_minutes",
-        "duration_enforcement_mode",
-        "reminder_settings_section",
-        "enable_reminders",
-        "reminder_minutes",
-        "column_break_reminder",
-        "send_reminder_email",
-        "reminder_email_template",
-        "email_settings_section",
-        "send_email_invite",
-        "email_template",
-        "column_break_email",
-        "reschedule_email_template",
-        "cancellation_email_template",
-        "webhook_secret"
-    ],
-    "fields": [
-        {
-            "fieldname": "jitsi_configuration_section",
-            "fieldtype": "Section Break",
-            "label": "Jitsi Configuration"
-        },
-        {
-            "description": "e.g. meet.jit.si or your self-hosted domain",
-            "fieldname": "jitsi_domain",
-            "fieldtype": "Data",
-            "label": "Jitsi Domain"
-        },
-        {
-            "description": "From your Jitsi server",
-            "fieldname": "app_id",
-            "fieldtype": "Data",
-            "label": "App ID"
-        },
-        {
-            "description": "JWT signing secret",
-            "fieldname": "app_secret",
-            "fieldtype": "Password",
-            "label": "App Secret"
-        },
-        {
-            "fieldname": "default_settings_section",
-            "fieldtype": "Section Break",
-            "label": "Default Settings"
-        },
-        {
-            "default": "60",
-            "fieldname": "default_duration",
-            "fieldtype": "Int",
-            "label": "Default Duration (mins)"
-        },
-        {
-            "default": "0",
-            "fieldname": "enable_waiting_room",
-            "fieldtype": "Check",
-            "label": "Enable Waiting Room / Lobby"
-        },
-        {
-            "default": "0",
-            "description": "Self-hosted only",
-            "fieldname": "enable_recording",
-            "fieldtype": "Check",
-            "label": "Enable Recording"
-        },
-        {
-            "fieldname": "column_break_duration",
-            "fieldtype": "Column Break"
-        },
-        {
-            "default": "0",
-            "description": "Restrict meetings from exceeding the max duration",
-            "fieldname": "enforce_duration_limit",
-            "fieldtype": "Check",
-            "label": "Enforce Duration Limit"
-        },
-        {
-            "default": "120",
-            "depends_on": "eval:doc.enforce_duration_limit",
-            "description": "Maximum allowed meeting duration in minutes",
-            "fieldname": "max_duration_minutes",
-            "fieldtype": "Int",
-            "label": "Max Duration (mins)"
-        },
-        {
-            "default": "Warn",
-            "depends_on": "eval:doc.enforce_duration_limit",
-            "description": "Warn = show alert but allow; Hard = block save",
-            "fieldname": "duration_enforcement_mode",
-            "fieldtype": "Select",
-            "label": "Enforcement Mode",
-            "options": "Warn\nHard"
-        },
-        {
-            "fieldname": "reminder_settings_section",
-            "fieldtype": "Section Break",
-            "label": "Reminder Settings"
-        },
-        {
-            "default": "1",
-            "description": "Send popup and/or email reminders before meetings",
-            "fieldname": "enable_reminders",
-            "fieldtype": "Check",
-            "label": "Enable Reminders"
-        },
-        {
-            "default": "10",
-            "depends_on": "eval:doc.enable_reminders",
-            "description": "Minutes before meeting to send reminder",
-            "fieldname": "reminder_minutes",
-            "fieldtype": "Int",
-            "label": "Reminder Before (mins)"
-        },
-        {
-            "fieldname": "column_break_reminder",
-            "fieldtype": "Column Break"
-        },
-        {
-            "default": "1",
-            "depends_on": "eval:doc.enable_reminders",
-            "description": "Also send an email reminder",
-            "fieldname": "send_reminder_email",
-            "fieldtype": "Check",
-            "label": "Send Email Reminder"
-        },
-        {
-            "depends_on": "eval:doc.enable_reminders && doc.send_reminder_email",
-            "fieldname": "reminder_email_template",
-            "fieldtype": "Link",
-            "label": "Reminder Email Template",
-            "options": "Email Template"
-        },
-        {
-            "fieldname": "email_settings_section",
-            "fieldtype": "Section Break",
-            "label": "Email Settings"
-        },
-        {
-            "default": "0",
-            "description": "Auto-send on save",
-            "fieldname": "send_email_invite",
-            "fieldtype": "Check",
-            "label": "Send Email Invite"
-        },
-        {
-            "depends_on": "eval:doc.send_email_invite",
-            "fieldname": "email_template",
-            "fieldtype": "Link",
-            "label": "Email Template",
-            "options": "Email Template"
-        },
-        {
-            "fieldname": "column_break_email",
-            "fieldtype": "Column Break"
-        },
-        {
-            "depends_on": "eval:doc.send_email_invite",
-            "description": "Template for reschedule notifications",
-            "fieldname": "reschedule_email_template",
-            "fieldtype": "Link",
-            "label": "Reschedule Email Template",
-            "options": "Email Template"
-        },
-        {
-            "depends_on": "eval:doc.send_email_invite",
-            "description": "Template for cancellation notifications",
-            "fieldname": "cancellation_email_template",
-            "fieldtype": "Link",
-            "label": "Cancellation Email Template",
-            "options": "Email Template"
-        },
-        {
-            "fieldname": "webhook_secret",
-            "fieldtype": "Data",
-            "label": "Webhook Secret"
-        }
-    ],
-    "grid_page_length": 50,
-    "index_web_pages_for_search": 1,
-    "issingle": 1,
-    "links": [],
-    "modified": "2026-04-28 11:05:00.000000",
-    "modified_by": "Administrator",
-    "module": "Frappe Huddle",
-    "name": "Huddle Settings",
-    "owner": "Administrator",
-    "permissions": [
-        {
-            "create": 1,
-            "delete": 1,
-            "email": 1,
-            "print": 1,
-            "read": 1,
-            "role": "System Manager",
-            "share": 1,
-            "write": 1
-        }
-    ],
-    "row_format": "Dynamic",
-    "rows_threshold_for_grid_search": 20,
-    "sort_field": "modified",
-    "sort_order": "DESC",
-    "states": []
+ "actions": [],
+ "creation": "2026-04-18 11:22:37.859968",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "meeting_defaults_section",
+  "default_duration",
+  "enforce_duration_limit",
+  "max_duration_minutes",
+  "duration_enforcement_mode",
+  "enable_waiting_room",
+  "max_participants",
+  "reconnect_timeout_seconds",
+  "reminders_section",
+  "enable_reminders",
+  "reminder_minutes",
+  "send_reminder_email",
+  "reminder_email_template",
+  "invitations_section",
+  "send_email_invite",
+  "email_template",
+  "reschedule_email_template",
+  "cancellation_email_template",
+  "livekit_section",
+  "livekit_api_key",
+  "livekit_url",
+  "livekit_rest_url",
+  "livekit_room_prefix",
+  "livekit_empty_timeout",
+  "column_break_livekit",
+  "livekit_api_secret",
+  "livekit_webhook_secret",
+  "livekit_enable_recording"
+ ],
+ "fields": [
+  {"fieldname": "meeting_defaults_section", "fieldtype": "Section Break", "label": "Meeting Defaults"},
+  {"fieldname": "default_duration", "fieldtype": "Int", "label": "Default Duration (mins)", "default": "60"},
+  {"fieldname": "enforce_duration_limit", "fieldtype": "Check", "label": "Enforce Duration Limit"},
+  {"fieldname": "max_duration_minutes", "fieldtype": "Int", "label": "Max Duration (mins)", "default": "480", "depends_on": "eval:doc.enforce_duration_limit==1"},
+  {"fieldname": "duration_enforcement_mode", "fieldtype": "Select", "label": "Enforcement Mode", "options": "Warn\nHard", "depends_on": "eval:doc.enforce_duration_limit==1"},
+  {"fieldname": "enable_waiting_room", "fieldtype": "Check", "label": "Enable Waiting Room"},
+  {"fieldname": "max_participants", "fieldtype": "Int", "label": "Max Participants", "default": "50"},
+  {"fieldname": "reconnect_timeout_seconds", "fieldtype": "Int", "label": "Reconnect Timeout (seconds)", "default": "60", "description": "Grace period before marking a disconnected participant as fully left (30-90s recommended)."},
+  {"fieldname": "reminders_section", "fieldtype": "Section Break", "label": "Reminders"},
+  {"fieldname": "enable_reminders", "fieldtype": "Check", "label": "Enable Reminders", "default": "1"},
+  {"fieldname": "reminder_minutes", "fieldtype": "Int", "label": "Reminder Minutes", "default": "10", "depends_on": "eval:doc.enable_reminders==1"},
+  {"fieldname": "send_reminder_email", "fieldtype": "Check", "label": "Send Reminder Email", "default": "1", "depends_on": "eval:doc.enable_reminders==1"},
+  {"fieldname": "reminder_email_template", "fieldtype": "Link", "label": "Reminder Email Template", "options": "Email Template", "depends_on": "eval:doc.send_reminder_email==1"},
+  {"fieldname": "invitations_section", "fieldtype": "Section Break", "label": "Email Templates"},
+  {"fieldname": "send_email_invite", "fieldtype": "Check", "label": "Send Email Invite"},
+  {"fieldname": "email_template", "fieldtype": "Link", "label": "Email Template", "options": "Email Template"},
+  {"fieldname": "reschedule_email_template", "fieldtype": "Link", "label": "Reschedule Email Template", "options": "Email Template"},
+  {"fieldname": "cancellation_email_template", "fieldtype": "Link", "label": "Cancellation Email Template", "options": "Email Template"},
+  {"fieldname": "livekit_section", "fieldtype": "Section Break", "label": "LiveKit Cloud Configuration"},
+  {"fieldname": "livekit_api_key", "fieldtype": "Password", "label": "LiveKit API Key", "description": "From LiveKit Cloud Dashboard."},
+  {"fieldname": "livekit_url", "fieldtype": "Data", "label": "LiveKit Server URL (WSS)", "description": "wss://your-project.livekit.cloud"},
+  {"fieldname": "livekit_rest_url", "fieldtype": "Data", "label": "LiveKit REST URL", "description": "e.g. https://your-project.livekit.cloud"},
+  {"fieldname": "livekit_room_prefix", "fieldtype": "Data", "label": "Room Prefix", "description": "Prefix for generated room names (e.g. huddle-).", "default": "huddle-"},
+  {"fieldname": "livekit_empty_timeout", "fieldtype": "Int", "label": "Empty Room Timeout (secs)", "description": "Seconds after which LiveKit auto-closes an empty room.", "default": "300"},
+  {"fieldname": "column_break_livekit", "fieldtype": "Column Break"},
+  {"fieldname": "livekit_api_secret", "fieldtype": "Password", "label": "LiveKit API Secret"},
+  {"fieldname": "livekit_webhook_secret", "fieldtype": "Password", "label": "Webhook Secret", "description": "Used to verify incoming webhook payloads."},
+  {"fieldname": "livekit_enable_recording", "fieldtype": "Check", "label": "Enable Cloud Recording", "description": "Requires LiveKit egress/recording configured."}
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-05-18 15:50:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Huddle",
+ "name": "Huddle Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {"create": 1, "delete": 1, "email": 1, "print": 1, "read": 1, "role": "System Manager", "share": 1, "write": 1}
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
 }

@@ -1,39 +1,31 @@
 import frappe
-import uuid
+from frappe.utils import format_datetime, get_url
 
-def generate_ics(meeting):
-	"""Generate iCalendar text block for attachments."""
-	frappe_start = frappe.utils.get_datetime(meeting.meeting_date)
-	frappe_end = frappe.utils.get_datetime(meeting.end_date) if meeting.end_date else frappe.utils.add_to_date(meeting.meeting_date, minutes=meeting.duration or 60)
+def generate_ics(doc):
+	"""Generates ICS content for a Huddle Meeting."""
+	start = format_datetime(doc.meeting_date, "yyyyMMdd'T'HHmmss'Z'")
+	end = format_datetime(doc.end_date, "yyyyMMdd'T'HHmmss'Z'") if doc.end_date else start
 	
-	dtstart = frappe_start.strftime("%Y%m%dT%H%M%S")
-	dtend = frappe_end.strftime("%Y%m%dT%H%M%S")
-	stamp = frappe.utils.now_datetime().strftime("%Y%m%dT%H%M%S")
+	url = get_url(f"/app/huddle-meeting/{doc.name}")
 	
-	# Remove quotes and control chars for safe ICS
-	safe_title = meeting.title.replace('"', '').replace('\n', ' ')
+	description = doc.description or ""
+	description += f"\\n\\nJoin URL: {url}"
 	
 	ics = [
 		"BEGIN:VCALENDAR",
 		"VERSION:2.0",
 		"PRODID:-//Frappe Huddle//EN",
-		"METHOD:REQUEST",
+		"CALSCALE:GREGORIAN",
 		"BEGIN:VEVENT",
-		f"UID:{meeting.name}-{uuid.uuid4().hex[:8]}@frappe",
-		f"DTSTAMP:{stamp}",
-		f"DTSTART:{dtstart}",
-		f"DTEND:{dtend}",
-		f"SUMMARY:{safe_title}",
-		f"DESCRIPTION:Join video huddle here: {meeting.jitsi_url}",
-		f"LOCATION:Huddle Video Call",
-		f"URL:{meeting.jitsi_url}",
-		"STATUS:CONFIRMED",
-		"BEGIN:VALARM",
-		"TRIGGER:-PT10M",
-		"ACTION:DISPLAY",
-		"DESCRIPTION:Meeting Reminder",
-		"END:VALARM",
+		f"UID:{doc.name}@frappe_huddle",
+		f"DTSTAMP:{start}",
+		f"DTSTART:{start}",
+		f"DTEND:{end}",
+		f"SUMMARY:{doc.title}",
+		f"DESCRIPTION:{description}",
+		f"URL:{url}",
 		"END:VEVENT",
 		"END:VCALENDAR"
 	]
-	return "\r\n".join(ics)
+	
+	return "\n".join(ics)

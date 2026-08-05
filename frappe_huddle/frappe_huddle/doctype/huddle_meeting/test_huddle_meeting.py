@@ -1,159 +1,178 @@
-# Copyright (c) 2026, Sakthi and Contributors
-# See license.txt
+# Copyright (c) 2026, Sakthi and contributors
+# For license information, please see license.txt
 
 import frappe
 from frappe.tests.utils import FrappeTestCase
 from frappe.utils import add_to_date, now_datetime
 
 
-def make_meeting(**kwargs):
-	"""Helper: create a minimal Huddle Meeting doc for tests."""
-	defaults = {
-		"doctype": "Huddle Meeting",
-		"title": "Test Huddle",
-		"meeting_date": str(add_to_date(now_datetime(), minutes=30)),
-		"duration": 60,
-		"status": "Scheduled",
-	}
-	defaults.update(kwargs)
-	doc = frappe.get_doc(defaults)
-	doc.insert(ignore_permissions=True)
-	return doc
-
-
 class TestHuddleMeeting(FrappeTestCase):
-	# ── Status transitions ──────────────────────────────────────────────────
-
-	def test_future_meeting_stays_scheduled(self):
-		doc = make_meeting(meeting_date=str(add_to_date(now_datetime(), minutes=60)))
-		doc.update_status()
-		self.assertEqual(doc.status, "Scheduled")
-
-	def test_started_meeting_becomes_in_progress(self):
-		doc = make_meeting(meeting_date=str(add_to_date(now_datetime(), minutes=-5)))
-		doc.update_status()
-		self.assertEqual(doc.status, "In Progress")
-
-	def test_past_meeting_becomes_completed(self):
-		doc = make_meeting(
-			meeting_date=str(add_to_date(now_datetime(), minutes=-120)),
-			end_date=str(add_to_date(now_datetime(), minutes=-60)),
-		)
-		doc.update_status()
-		self.assertEqual(doc.status, "Completed")
-
-	def test_cancelled_meeting_status_never_changes(self):
-		doc = make_meeting(
-			status="Cancelled",
-			meeting_date=str(add_to_date(now_datetime(), minutes=-120)),
-		)
-		changed = doc.update_status()
-		self.assertFalse(changed)
-		self.assertEqual(doc.status, "Cancelled")
-
-	# ── Room name generation ────────────────────────────────────────────────
-
-	def test_room_name_is_generated_on_insert(self):
-		doc = make_meeting()
-		self.assertIsNotNone(doc.jitsi_room)
-		self.assertIn("test-huddle", doc.jitsi_room)
-
-	def test_room_name_not_regenerated_on_update(self):
-		doc = make_meeting()
-		original_room = doc.jitsi_room
-		doc.title = "Updated Title"
-		doc.save(ignore_permissions=True)
-		self.assertEqual(doc.jitsi_room, original_room)
-
-	# ── join_meeting() authorization ────────────────────────────────────────
-
-	def test_non_participant_cannot_join(self):
-		"""A user not in the participants list must be denied."""
-		doc = make_meeting()
-		# Simulate a different user calling join_meeting
-		frappe.set_user("Guest")
-		try:
-			from frappe_huddle.frappe_huddle.doctype.huddle_meeting.huddle_meeting import (
-				join_meeting,
-			)
-
-			with self.assertRaises(frappe.exceptions.ValidationError):
-				join_meeting(doc.name)
-		finally:
-			frappe.set_user("Administrator")
-
-	# ── Duration validation ─────────────────────────────────────────────────
-
-	def test_end_date_calculated_from_duration(self):
-		doc = make_meeting(
-			meeting_date=str(add_to_date(now_datetime(), minutes=60)), duration=30
-		)
-		self.assertIsNotNone(doc.end_date)
-		# end_date should be meeting_date + 30 min
-		diff = frappe.utils.time_diff_in_seconds(doc.end_date, doc.meeting_date)
-		self.assertEqual(int(diff / 60), 30)
-
-	# ── JWT token ───────────────────────────────────────────────────────────
-
-	def test_jwt_not_generated_without_secret(self):
-		"""If app_secret is blank, _generate_jwt_token returns None."""
-		doc = make_meeting()
-		settings = frappe._dict(app_secret=None, app_id="", enable_recording=0, enable_waiting_room=0)
-		token = doc._generate_jwt_token(settings)
-		self.assertIsNone(token)
-
-	def test_jwt_generated_with_hs256_secret(self):
-		"""A valid secret produces a 3-part JWT string."""
-		try:
-			import jwt as pyjwt
-		except ImportError:
-			self.skipTest("pyjwt not installed")
-
-		doc = make_meeting()
-
-		class FakeSettings:
-			app_secret = "test-secret-key"
-			app_id = "test-app"
-			enable_recording = False
-			enable_waiting_room = False
-
-			def get_password(self, _):
-				return self.app_secret
-
-		token = doc._generate_jwt_token(FakeSettings())
-		self.assertIsNotNone(token)
-		self.assertEqual(len(token.split(".")), 3, "JWT should have 3 dot-separated parts")
-
-	def test_jwt_secret_with_dots_is_still_signed(self):
-		"""
-		FIX regression test: a secret that contains dots (common in base64)
-		must NOT be returned as-is — it must be signed properly.
-		"""
-		try:
-			import jwt as pyjwt
-		except ImportError:
-			self.skipTest("pyjwt not installed")
-
-		doc = make_meeting()
-		dotted_secret = "abc.def.ghi"  # 3 parts — the old code returned this as-is
-
-		class FakeSettings:
-			app_secret = dotted_secret
-			app_id = "test-app"
-			enable_recording = False
-			enable_waiting_room = False
-
-			def get_password(self, _):
-				return self.app_secret
-
-		token = doc._generate_jwt_token(FakeSettings())
-		# Must NOT equal the raw secret
-		self.assertNotEqual(token, dotted_secret)
-		# Must be a valid signed JWT (decodable with the secret)
-		decoded = pyjwt.decode(token, dotted_secret, algorithms=["HS256"], audience="jitsi")
-		self.assertEqual(decoded["room"], doc.jitsi_room)
-
-	# ── Cleanup ─────────────────────────────────────────────────────────────
+	def setUp(self):
+		# Clean up any leftover test data
+		frappe.db.delete("Huddle Participant", {"parent": ["like", "HM-%"]})
+		frappe.db.delete("Huddle Meeting", {"title": ["like", "Test %"]})
 
 	def tearDown(self):
-		frappe.db.rollback()
+		frappe.db.delete("Huddle Participant", {"parent": ["like", "HM-%"]})
+		frappe.db.delete("Huddle Meeting", {"title": ["like", "Test %"]})
+
+	def get_future_meeting_date(self):
+		return add_to_date(now_datetime(), days=1).strftime("%Y-%m-%d %H:%M:%S")
+
+	# ── Room ID ──────────────────────────────────────────────────────────
+
+	def test_room_id_auto_generated(self):
+		"""room_id should be auto-generated when starting a meeting."""
+		doc = frappe.get_doc({
+			"doctype": "Huddle Meeting",
+			"title": "Test Auto Room",
+			"host": "Administrator",
+			"meeting_date": self.get_future_meeting_date(),
+		})
+		doc.insert(ignore_permissions=True)
+		self.assertFalse(doc.room_id, "room_id should not exist on insert")
+		
+		doc.start_meeting()
+		self.assertTrue(doc.room_id, "room_id should be auto-generated on start")
+
+	def test_room_id_is_unique(self):
+		"""Two started meetings should never have the same room_id."""
+		doc1 = frappe.get_doc({
+			"doctype": "Huddle Meeting",
+			"title": "Test Unique Room 1",
+			"host": "Administrator",
+			"meeting_date": self.get_future_meeting_date(),
+		})
+		doc1.insert(ignore_permissions=True)
+		doc1.start_meeting()
+
+		doc2 = frappe.get_doc({
+			"doctype": "Huddle Meeting",
+			"title": "Test Unique Room 2",
+			"host": "Administrator",
+			"meeting_date": self.get_future_meeting_date(),
+		})
+		doc2.insert(ignore_permissions=True)
+		doc2.start_meeting()
+		self.assertNotEqual(doc1.room_id, doc2.room_id)
+
+	# ── Status Transitions ───────────────────────────────────────────────
+
+	def test_default_status_is_scheduled(self):
+		"""New meetings should default to Scheduled."""
+		doc = frappe.get_doc({
+			"doctype": "Huddle Meeting",
+			"title": "Test Default Status",
+			"host": "Administrator",
+			"meeting_date": self.get_future_meeting_date(),
+		})
+		doc.insert(ignore_permissions=True)
+		self.assertEqual(doc.status, "Scheduled")
+
+	def test_start_meeting(self):
+		"""start_meeting() should set status=Live, is_active=1, started_at."""
+		doc = frappe.get_doc({
+			"doctype": "Huddle Meeting",
+			"title": "Test Start Meeting",
+			"host": "Administrator",
+			"meeting_date": self.get_future_meeting_date(),
+		})
+		doc.insert(ignore_permissions=True)
+		doc.start_meeting()
+		self.assertEqual(doc.status, "Live")
+		self.assertEqual(doc.is_active, 1)
+		self.assertIsNotNone(doc.started_at)
+
+	def test_end_meeting(self):
+		"""end_meeting() should set status=Ended, is_active=0, ended_at."""
+		doc = frappe.get_doc({
+			"doctype": "Huddle Meeting",
+			"title": "Test End Meeting",
+			"host": "Administrator",
+			"meeting_date": self.get_future_meeting_date(),
+		})
+		doc.insert(ignore_permissions=True)
+		doc.start_meeting()
+		doc.end_meeting()
+		self.assertEqual(doc.status, "Ended")
+		self.assertEqual(doc.is_active, 0)
+		self.assertIsNotNone(doc.ended_at)
+
+	def test_cancel_meeting(self):
+		"""cancel_meeting() should set status=Cancelled, is_active=0."""
+		doc = frappe.get_doc({
+			"doctype": "Huddle Meeting",
+			"title": "Test Cancel Meeting",
+			"host": "Administrator",
+			"meeting_date": self.get_future_meeting_date(),
+		})
+		doc.insert(ignore_permissions=True)
+		doc.cancel_meeting()
+		self.assertEqual(doc.status, "Cancelled")
+		self.assertEqual(doc.is_active, 0)
+
+	# ── Host Auto-set ────────────────────────────────────────────────────
+
+	def test_host_auto_set(self):
+		"""Host should auto-set to current user if not provided."""
+		doc = frappe.get_doc({
+			"doctype": "Huddle Meeting",
+			"title": "Test Host Autoset",
+			"meeting_date": self.get_future_meeting_date(),
+		})
+		doc.insert(ignore_permissions=True)
+		self.assertEqual(doc.host, frappe.session.user)
+
+	# ── Naming ───────────────────────────────────────────────────────────
+
+	def test_naming_format(self):
+		"""Meeting names should follow the HM-#### format."""
+		doc = frappe.get_doc({
+			"doctype": "Huddle Meeting",
+			"title": "Test Naming",
+			"host": "Administrator",
+			"meeting_date": self.get_future_meeting_date(),
+		})
+		doc.insert(ignore_permissions=True)
+		self.assertTrue(doc.name.startswith("HM-"), f"Name {doc.name} should start with HM-")
+
+	# ── Join & Leave APIs ────────────────────────────────────────────────
+
+	def test_join_meeting_with_session_id(self):
+		"""A user can join a meeting, which creates a Huddle Session, and rejoin, which updates state."""
+		from frappe_huddle.frappe_huddle.doctype.huddle_meeting.huddle_meeting import join_meeting, leave_meeting
+		
+		frappe.set_user("Administrator")
+		meeting = frappe.get_doc({
+			"doctype": "Huddle Meeting",
+			"title": "Test Multiple Sessions",
+			"host": "Administrator",
+			"meeting_date": self.get_future_meeting_date(),
+		})
+		meeting.insert(ignore_permissions=True)
+		meeting.start_meeting()
+
+		# Join session A
+		result1 = join_meeting(meeting.name)
+		self.assertTrue(result1["success"])
+
+		# Rejoin (same user)
+		result2 = join_meeting(meeting.name)
+		self.assertTrue(result2["success"])
+		self.assertEqual(result1["participant"], result2["participant"])
+
+		# Total active participants for Administrator should be 1
+		active_count = frappe.db.count("Huddle Participant", {
+			"parent": meeting.name,
+			"user": "Administrator",
+			"is_active": 1
+		})
+		self.assertEqual(active_count, 1)
+
+		# Leave
+		leave_meeting(meeting.name)
+		
+		# Participant should be inactive
+		p_a = frappe.get_doc("Huddle Participant", result1["participant"])
+		self.assertEqual(p_a.is_active, 0)
+		self.assertEqual(p_a.state, "Left")

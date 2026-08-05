@@ -1,15 +1,14 @@
 [project]
 name = "frappe_huddle"
 authors = [
-    { name = "Sakthi", email = "sakthikaribeeran@gmail.com"}
+	{ name = "Sakthi", email = "sakthikaribeeran@gmail.com" }
 ]
-description = "Open source video meetings inside Frappe using Jitsi"
+description = "Open source meeting tracking system inside Frappe"
 requires-python = ">=3.10"
 readme = "README.md"
 dynamic = ["version"]
 dependencies = [
-    # "frappe~=15.0.0" # Installed and managed by bench.
-    "PyJWT>=2.4.0",
+	"livekit-api>=0.7.0",
 ]
 
 [build-system]
@@ -26,28 +25,28 @@ target-version = "py310"
 
 [tool.ruff.lint]
 select = [
-    "F",
-    "E",
-    "W",
-    "I",
-    "UP",
-    "B",
-    "RUF",
+	"F",
+	"E",
+	"W",
+	"I",
+	"UP",
+	"B",
+	"RUF",
 ]
 ignore = [
-    "B017", # assertRaises(Exception) - should be more specific
-    "B018", # useless expression, not assigned to anything
-    "B023", # function doesn't bind loop variable - will have last iteration's value
-    "B904", # raise inside except without from
-    "E101", # indentation contains mixed spaces and tabs
-    "E402", # module level import not at top of file
-    "E501", # line too long
-    "E741", # ambiguous variable name
-    "F401", # "unused" imports
-    "F403", # can't detect undefined names from * import
-    "F405", # can't detect undefined names from * import
-    "F722", # syntax error in forward type annotation
-    "W191", # indentation contains tabs
+	"B017", # assertRaises(Exception) - should be more specific
+	"B018", # useless expression, not assigned to anything
+	"B023", # function doesn't bind loop variable - will have last iteration's value
+	"B904", # raise inside except without from
+	"E101", # indentation contains mixed spaces and tabs
+	"E402", # module level import not at top of file
+	"E501", # line too long
+	"E741", # ambiguous variable name
+	"F401", # "unused" imports
+	"F403", # can't detect undefined names from * import
+	"F405", # can't detect undefined names from * import
+	"F722", # syntax error in forward type annotation
+	"W191", # indentation contains tabs
 ]
 typing-modules = ["frappe.types.DF"]
 
@@ -55,3 +54,13 @@ typing-modules = ["frappe.types.DF"]
 quote-style = "double"
 indent-style = "tab"
 docstring-code-format = true
+
+[tool.pyright]
+venvPath = "/home/frappe/frappe-bench"
+venv = "env"
+extraPaths = [
+	"/home/frappe/frappe-bench/env/lib/python3.10/site-packages",
+	"/home/frappe/frappe-bench/apps/frappe"
+]
+reportAttributeAccessIssue = "none"
+reportGeneralTypeIssues = "none"

@@ -8,10 +8,12 @@
     "field_order": [
         "meeting",
         "participant",
+        "session",
         "join_time",
         "leave_time",
         "duration",
-        "session_id"
+        "is_complete",
+        "disconnect_reason"
     ],
     "fields": [
         {
@@ -27,31 +29,49 @@
             "options": "User"
         },
         {
+            "fieldname": "session",
+            "fieldtype": "Link",
+            "label": "Session",
+            "options": "Huddle Session"
+        },
+        {
             "fieldname": "join_time",
             "fieldtype": "Datetime",
-            "label": "Join Time"
+            "label": "Join Time",
+            "read_only": 1
         },
         {
             "fieldname": "leave_time",
             "fieldtype": "Datetime",
-            "label": "Leave Time"
+            "label": "Leave Time",
+            "read_only": 1
         },
         {
             "fieldname": "duration",
             "fieldtype": "Float",
-            "label": "Duration (Seconds)"
+            "label": "Duration (Seconds)",
+            "read_only": 1
         },
         {
-            "fieldname": "session_id",
-            "fieldtype": "Data",
-            "label": "Session ID"
+            "fieldname": "is_complete",
+            "fieldtype": "Check",
+            "label": "Is Complete",
+            "read_only": 1,
+            "default": "0"
+        },
+        {
+            "fieldname": "disconnect_reason",
+            "fieldtype": "Select",
+            "label": "Disconnect Reason",
+            "options": "Normal\nKicked\nTimeout\nNetwork Drop\nServer Close",
+            "read_only": 1
         }
     ],
     "grid_page_length": 50,
     "index_web_pages_for_search": 1,
     "istable": 0,
     "links": [],
-    "modified": "2026-04-25 08:00:40.887394",
+    "modified": "2026-05-18 15:00:00.000000",
     "modified_by": "Administrator",
     "module": "Frappe Huddle",
     "name": "Huddle Attendance Log",

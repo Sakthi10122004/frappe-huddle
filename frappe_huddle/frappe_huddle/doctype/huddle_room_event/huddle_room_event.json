@@ -1,0 +1,45 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:HRE-{####}",
+ "creation": "2026-05-14 15:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "meeting",
+  "session",
+  "event_type",
+  "source",
+  "triggered_by",
+  "target_user",
+  "timestamp",
+  "metadata"
+ ],
+ "fields": [
+  {"fieldname": "meeting", "fieldtype": "Link", "label": "Meeting", "options": "Huddle Meeting", "reqd": 1, "in_list_view": 1},
+  {"fieldname": "session", "fieldtype": "Link", "label": "Session", "options": "Huddle Session"},
+  {"fieldname": "event_type", "fieldtype": "Select", "label": "Event Type", "options": "Joined\nLeft\nMuted\nUnmuted\nKicked\nScreen Share Started\nScreen Share Stopped\nRecording Started\nRecording Stopped\nAdmitted from Lobby\nMeeting Started\nMeeting Ended\nHost Changed\nRoom Locked\nRoom Unlocked", "reqd": 1, "in_list_view": 1},
+  {"fieldname": "source", "fieldtype": "Select", "label": "Source", "options": "Webhook\nSystem\nManual", "read_only": 1, "default": "System"},
+  {"fieldname": "triggered_by", "fieldtype": "Link", "label": "Triggered By", "options": "User", "reqd": 1, "in_list_view": 1},
+  {"fieldname": "target_user", "fieldtype": "Link", "label": "Target User", "options": "User", "description": "The user affected by this event (for kicks, mutes, etc.)."},
+  {"fieldname": "timestamp", "fieldtype": "Datetime", "label": "Timestamp", "reqd": 1, "read_only": 1, "in_list_view": 1},
+  {"fieldname": "metadata", "fieldtype": "JSON", "label": "Metadata", "description": "Extra context for the event in JSON format."}
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-05-18 15:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Frappe Huddle",
+ "name": "Huddle Room Event",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {"create": 1, "delete": 1, "read": 1, "report": 1, "role": "System Manager", "write": 1},
+  {"read": 1, "role": "Huddle Admin", "export": 1}
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
